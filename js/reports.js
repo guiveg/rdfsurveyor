@@ -41,6 +41,8 @@ function sendEvent(action) {
 		if (config.gaenabled && config.gaproperty != undefined) {
 			ga('send', 'event', Report.cat, action, Report.label);
 		}
+		// show log message in the console
+		console.log(Report.cat + " | " + action + " | " + Report.label);
 	}
 }
 
@@ -52,6 +54,8 @@ function sendElapsedTiming() {
 		if (config.gaenabled && config.gaproperty != undefined) {
 			ga('send', 'timing', Report.cat, 'latency', elapsed, Report.label + ' (nqueries: '+Report.nqueries+')');
 		}
+		// show log message in the console
+		console.log(Report.cat + " | latency: " + elapsed + " | " + Report.label + ' (nqueries: '+Report.nqueries+')');
 	}
 }
 
@@ -61,5 +65,7 @@ function sendNqueriesTiming() {
 		if (config.gaenabled && config.gaproperty != undefined) {
 			ga('send', 'timing', Report.cat, 'nqueries', Report.nqueries, Report.label);
 		}
+		// show log message in the console
+		console.log(Report.cat + " | nqueries: " + Report.nqueries + " | " + Report.label);
 	}
 }
