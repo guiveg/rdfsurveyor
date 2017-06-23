@@ -26,6 +26,12 @@ RDF Surveyor is a web application developed in Javascript. You can easily deploy
 To begin the exploration of a repository, you only need to copy the URI of the target SPARQL endpoint (and optionally the URI of the named graph). You can also import the URIs of some well-known repositories such as DBpedia with the "Import configuration" button.
 
 
+Help us to improve
+==========
+RDF Surveyor is available under an Apache 2 license. Please send us an email to [guiveg@ifi.uio.no](mailto:guiveg@ifi.uio.no) if you use or plan to use RDF Surveyor in a project. Drop us also a message if you have comments or suggestions for improvement.
+
+
+
 Screenshots
 ==========
 Some screenshots of RDF Surveyor:
@@ -55,11 +61,11 @@ You can edit the parameters of the configuration file at `etc/data/config.js`:
 
 * `hidebegin`: element index to begin hiding (default 5)
 
-* `repos`: preloaded configuration of repositories. Echa element should have a name, an endpoint URI, and optionally a named graph URI
+* `repos`: preloaded configuration of repositories. Each element should have a name, an endpoint URI, and optionally a named graph URI
 
 * `geoenabled`: if true, RDF Surveyor will try to find geographic coordinates for individuals and show a map widget provided by [Leaflet](http://leafletjs.com/). 
 
-* `geooptions`: the map widget provided by [Leaflet](http://leafletjs.com/) requires your own `accessToken`
+* `geooptions`: the map widget provided by [Leaflet](http://leafletjs.com/) requires your own `accessToken`. The rest of parameters here should not be changed
 
 * `gaenabled`: if true, RDF Surveyor will log events (requested resource, latency, and number of SPARQL queries) through [Google Analytics](https://www.google.com/analytics/)
 
