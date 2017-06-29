@@ -11,28 +11,42 @@
    limitations under the License.
 */
 
-function SparqlServer(uri, httpMethod, gruri) {
+function SparqlServer(uri, httpMethod, gruri, auth) {
     var method = (httpMethod) ? httpMethod : "GET";
     var graph = (gruri) ? gruri : undefined;
     
     this.querySparql = function(query, retfunc, failfunc) {
-    	// datos para la consulta
+    	// query data
     	var qdata = {};
-    	// hay graph?
+    	// is there a graph?
 		if (graph != undefined)
 			qdata["default-graph-uri"] = graph;
-		// resto de datos 
+		// remaining data
     	qdata.query = query;
 		qdata.format = 'json';
 		qdata.Accept = 'application/sparql-results+json';
-    
-		var jqxhr = $.ajax({
+		
+		// ajax settings
+		var ajaxsettings = {
 			url: uri,
 			dataType: "json",
 			type: method,
 			data: qdata
-			});
-	
+		};		
+		
+		// auth
+		if (auth != undefined) {
+			ajaxsettings.beforeSend = function (xhr) {
+			    xhr.setRequestHeader ('Authorization', 'Basic ' + auth);
+			};		
+		};		
+		
+		// probando auth...
+		//qdata.Authorization = 'Basic ' + btoa('s4h98jlqp297:km5trmc6k93hgf5');
+    
+    	// send ajax request
+		var jqxhr = $.ajax(ajaxsettings);	
+		
 		jqxhr.done(function(datos) {
 			// need to store data!
 			Grabar = true;
@@ -51,8 +65,8 @@ function SparqlServer(uri, httpMethod, gruri) {
     };    
 };
 
-function DataProvider(uri, httpMethod, gruri, defaultFailFunc) {
-    var sparqlserver = new SparqlServer(uri, httpMethod, gruri);
+function DataProvider(uri, httpMethod, gruri, defaultFailFunc, auth) {
+    var sparqlserver = new SparqlServer(uri, httpMethod, gruri, auth);
     
     /**
        queryname: name of the query

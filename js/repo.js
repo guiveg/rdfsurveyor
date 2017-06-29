@@ -89,60 +89,7 @@ function configRepo() {
 	
 	// begin survey!
 	$("#survey_button").click(function() {
-		// get values from the form
-		var endpoint = $("#sparql_uri").val();
-		var graph = $("#graph_uri").val();
-		//console.log("endpoint: " + endpoint);
-		//console.log("graph: " + graph);
-				
-		// special case for DBpedia: set always a named graph
-		if (endpoint === "http://dbpedia.org/sparql" && graph === "")
-			graph = "http://dbpedia.org";
-		
-		// config data provider if there is endpoint
-		if (endpoint !== "") {
-			configDataProvider(endpoint, graph);
-			// check if configuration is valid
-			DataProv.getData('test', {}, function(datos) { // success
-				// no data??
-				if (datos.results.bindings.length == 0) {
-					// show alert
-					var mens = getLiteral(dict.nodata);
-					if (graph !== "")
-						mens += getLiteral(dict.wronggraph);
-					$("#alerta").html(mens);
-					$("#alerta").removeClass( "esconder" );
-					// survey button danger
-					updateSurveyButton(true);
-				}
-				else { // repository working :)
-					// prepare config object and update query dictionary for the redirect
-					var conf = {};
-					conf.endpoint = endpoint;
-					QueryDict.repo = endpoint;
-					if (graph !== "") {
-						conf.graph = graph;
-						QueryDict.graph = graph;
-					}
-					else
-						delete QueryDict.graph;
-					// save config object
-					sessionStorage.setItem("conf", JSON.stringify(conf));
-					// redirect
-					location = generateUrl();
-					//console.log("TODO BIEN");
-				}
-			}, function(jqXHR, status, errorThrown) { // error!
-				// show alert
-				var mens = getLiteral(dict.reponotworking);
-				if (errorThrown !== "")
-					mens += "<br>"+getLiteral(dict.repoerror)+"<br><samp>" + errorThrown + "</samp>";
-				$("#alerta").html(mens);
-				$("#alerta").removeClass( "esconder" );
-				// survey button danger
-				updateSurveyButton(true);
-			});
-		}		
+		testRepository();
 	});
 	
 	// retrieve conf object
@@ -184,13 +131,135 @@ function configRepo() {
 	sendEvent("landed");
 }
 
-function configDataProvider(endpoint, graph) {
+function testRepository(auth) {
+	// get values from the form
+	var endpoint = $("#sparql_uri").val();
+	var graph = $("#graph_uri").val();
+	//console.log("endpoint: " + endpoint);
+	//console.log("graph: " + graph);
+			
+	// special case for DBpedia: set always a named graph
+	if (endpoint === "http://dbpedia.org/sparql" && graph === "")
+		graph = "http://dbpedia.org";
+	
+	// config data provider if there is endpoint
+	if (endpoint !== "") {
+		configDataProvider(endpoint, graph, auth);
+		// check if configuration is valid
+		DataProv.getData('test', {}, function(datos) { // success
+			// no data??
+			if (datos.results.bindings.length == 0) {
+				// show alert
+				var mens = getLiteral(dict.nodata);
+				if (graph !== "")
+					mens += getLiteral(dict.wronggraph);
+				$("#alerta").html(mens);
+				$("#alerta").removeClass( "esconder" );
+				// survey button danger
+				updateSurveyButton(true);
+			}
+			else { // repository working :)
+				// prepare config object and update query dictionary for the redirect
+				var conf = {};
+				conf.endpoint = endpoint;
+				QueryDict.repo = endpoint;
+				if (graph !== "") {
+					conf.graph = graph;
+					QueryDict.graph = graph;
+				}
+				else
+					delete QueryDict.graph;
+				if (auth != undefined)
+					conf.auth = auth;
+				// save config object
+				sessionStorage.setItem("conf", JSON.stringify(conf));
+				// redirect
+				location = generateUrl();
+				//console.log("TODO BIEN");
+			}
+		}, function(jqXHR, status, errorThrown) { // error!			
+			// survey button danger
+			updateSurveyButton(true);
+			// authorization error?
+			if (errorThrown === "Unauthorized") {
+				// create modal auth form if it was not created before
+				if ($("#myAuthModal").length == 0) {
+					// modal form 
+					var modalform = '<div class="modal fade" id="myAuthModal" tabindex="-1" role="dialog" aria-labelledby="myAuthModalLabel"> \
+					  <div class="modal-dialog" role="document"> \
+						<div class="modal-content"> \
+						  <div class="modal-header"> \
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button> \
+							<h4 class="modal-title" id="myAuthModalLabel">'+getLiteral(dict.authreq)+'</h4> \
+						  </div> \
+						  <div class="modal-body"> \
+			<form class="form-horizontal"> \
+				<div class="form-group"> \
+				  <label for="user" class="col-sm-2 control-label">'+getLiteral(dict.user)+'</label> \
+				  <div class="col-sm-10"> \
+					<input class="form-control" id="user" type="text" placeholder="'+getLiteral(dict.user)+'..." required="true"> \
+				  </div> \
+				</div> \
+				<div class="form-group"> \
+				  <label for="password" class="col-sm-2 control-label">'+getLiteral(dict.password)+'</label> \
+				  <div class="col-sm-10"> \
+					<input class="form-control" id="password" type="password" placeholder="'+getLiteral(dict.password)+'..." required="true"> \
+				  </div> \
+				</div> \
+			</form> \
+			<div class="row"> \
+				<div class="col-sm-2"></div> \
+				<div class="col-xs-5"><button id="cancel_auth" class="btn btn-default">'+getLiteral(dict.cancel)+'</button></div> \
+				<div class="col-xs-2"><button id="init_session" class="btn btn-default">'+getLiteral(dict.initsession)+'</button></div> \
+			</div> \
+						  </div> \
+						</div> \
+					  </div> \
+					</div>';					
+					// append content
+					$("#contenedor").append( modalform );
+					// close modal listener
+					$("#cancel_auth").click(function() {
+						// close modal
+						$("#myAuthModal .close").click();
+					});
+					// authorization routine
+					$("#init_session").click(function() {
+						var user = $("#user").val();
+						var pwd = $("#password").val();
+						if (user !== "" ) {						
+							// close modal
+							$("#myAuthModal").modal('hide');	
+							// try authorization
+							$('#myAuthModal').on('hidden.bs.modal', function () {
+								$('#myAuthModal').off('hidden.bs.modal');
+  								testRepository( btoa(user + ':' + pwd) );
+							});
+						}
+					});					
+				}
+				// show modal window
+				$('#myAuthModal').modal('show');			
+			}
+			else {
+				// show alert
+				var mens = getLiteral(dict.reponotworking);
+				if (errorThrown !== "")
+					mens += "<br>"+getLiteral(dict.repoerror)+"<br><samp>" + errorThrown + "</samp>";
+				$("#alerta").html(mens);
+				$("#alerta").removeClass( "esconder" );
+			}
+		});
+	}
+}
+
+function configDataProvider(endpoint, graph, auth) {
 	if (graph != undefined && graph === "")
 		graph = undefined;
 	DataProv = new DataProvider(endpoint, "GET", graph,
 		function(jqXHR, status, errorThrown) {
 			console.log("ERROR!!!!\n"+status+"\n+"+errorThrown);
-		});
+		}, auth);
 }
 
 function updateSurveyButton(error) {
@@ -564,6 +633,20 @@ function renderRepo() {
 			$("#loader").addClass( "esconder" );
 			renderRepo();
 		});
+		/*
+		var $icon = $(this).find(".glyphicon");
+		if ($(this).hasClass("list-group-item-danger")) {
+			// remove filter!
+			$(this).removeClass("list-group-item-danger");
+			$icon.removeClass("glyphicon-remove");
+			$icon.addClass("glyphicon-ok");
+		}
+		else {
+			// include filter!
+			$(this).addClass("list-group-item-danger");
+			$icon.removeClass("glyphicon-ok");
+			$icon.addClass("glyphicon-remove");
+		}*/
 	});
 	
 	// report loaded event and timings
@@ -605,7 +688,13 @@ function handlerExpandClass() {
 				
 		// init CLASS-EXPAND report
 		createReport("CLASS-EXPAND", decodeURIComponent(location.search)+" -> "+cluri);
-
+			
+		/*{
+			if (ind == newindent -1)
+				indentspace += '&nbsp;&nbsp;<span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>&nbsp;&nbsp;';
+			else
+				indentspace += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+		}*/
 		getListClasses(Repo.classes[cluri].subclasses, "subclasses", function() {
 			getIndividualCount(Repo.classes[cluri].subclasses, true, function() {
 				// get list of classes for counting individuals 

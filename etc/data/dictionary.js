@@ -17,7 +17,7 @@ var dict = {
 	chooserepo: { "en": "Choose a repository",
 		"es": "Escoge un repositorio"},
 	survey: { "en": "Survey!",
-		"es": "¡Explorar!"},
+		"es": "¡Explorar!"},	
 	nodata: { "en": "<strong>No data in the repository!</strong>",
 		"es": "<strong>¡No hay datos en el repositorio!</strong>"},
 	wronggraph: { "en": "<br>Wrong graph URI?",	
@@ -26,6 +26,18 @@ var dict = {
 		"es": "<strong>¡¡El repositorio no funciona!!</strong><br>¿URI del punto SPARQL errónea?"},
 	repoerror: { "en": "This is the error thrown:",
 		"es": "Éste es el error lanzado:"},
+		
+	// auth
+	authreq: { "en": "Authorization required",
+		"es": "Autorización requerida"},
+	user: { "en": "User",
+		"es": "Usuario"},
+	password: { "en": "Password",
+		"es": "Contraseña"},
+	cancel: { "en": "Cancel",
+		"es": "Cancelar"},
+	initsession: { "en": "Init session",
+		"es": "Iniciar sesión"},	
 
 	// repo
 	reposurvey: { "en": "Surveying repository",
@@ -40,6 +52,7 @@ var dict = {
 		"es": "Recopilando información para filtrar las clases..."},
 	upperclasses: { "en": "Upper classes",
 		"es": "Clases superiores"},
+	//upperclassescomment: "Upper-level classes found in the triplestore.",
 	noupperclasses: { "en": "No classes found in the repository!",
 		"es": "¡No se encontraron clases en el repositorio!"},
 	isoclassespending: { "en": "Further processing ongoing to find isolated classes...",
@@ -117,3 +130,4 @@ var dict = {
 	indivsfound: { "en": "individuals found",
 		"es": "individuos encontrados"}
 };
+

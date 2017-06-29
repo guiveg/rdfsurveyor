@@ -103,6 +103,7 @@ function processSearchInput() {
 	if (input !== "") {
 		// redirect to search page
 		location = generateUrl("search", input);
+		//location = location.pathname + "?search=" + encodeURIComponent(input);
 	}
 }
 
@@ -154,7 +155,7 @@ function loadRepository() {
 				Repos.push(Repo);			
 			} 
 			// config data provider
-			configDataProvider(conf.endpoint, conf.graph);
+			configDataProvider(conf.endpoint, conf.graph, conf.auth);
 		}
 	}
 }
@@ -260,12 +261,18 @@ function loadRepos() {
 	Repos = [];
 	if (sessionStorage.getItem("repos") != null) {
 		// load repos
-		console.log("LOADING REPOS");
+		console.log("LOADING REPOS");	
+		//Repos = JSON.parse(sessionStorage.getItem("repos"));
 		Repos = JSON.parse( LZString.decompress(sessionStorage.getItem("repos")) );
 	}
 }
 
 function saveRepos() {
+	/*if (Grabar) {		
+		console.log("SAVING REPOS");
+		sessionStorage.setItem("repos", JSON.stringify(Repos) );
+		Grabar = false;
+	}*/
 	if (Grabar) {		
 		console.log("SAVING REPOS");
 		var cad = JSON.stringify(Repos);
