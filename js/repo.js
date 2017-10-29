@@ -361,7 +361,7 @@ function getUpperClasses(callback) {
 			_.each(datos.results.bindings, function(row) {
 				var newcluri = row.class.value;
 				// evaluate only if it's not a blank node
-				if (row.class.type === "uri") {
+				if (row.class.type === "uri" && newcluri !== "") {
 					Repo.upperclasses.push(newcluri);
 					// save new class if it does not exist
 					if (Repo.classes[newcluri] == undefined)
@@ -409,7 +409,7 @@ function getIsolatedClasses(callback) {
 				_.each(datos.results.bindings, function(row) {
 					var newcluri = row.class.value;
 					// evaluate only if it's not a blank node
-					if (row.class.type === "uri") {
+					if (row.class.type === "uri" && newcluri !== "") {
 						Repo.isolated.push(newcluri);
 						// save new class if it does not exist
 						if (Repo.classes[newcluri] == undefined) {
@@ -836,17 +836,19 @@ function processNamespaces(callback) {
 	listns = _.unique(listns);
 	// handle each namespace element
 	_.each(listns, function(ns) {
-		// try to find a match in the list of named namespaces
-		var prefix = _.findKey(queryPrefixes, function(pu) { return ns.startsWith(pu); });
-		if (prefix != undefined)
-			ns = queryPrefixes[prefix]; // this is to reduce the list of namespaces, e.g. http://dbpedia.org/class/yago/WikicatHIV/ is converted into http://dbpedia.org/class/yago/
-		// not in the repo?
-		if (_.find(Repo.namespaces, function(el) {return el.ns === ns;} ) == undefined) {
-			var nsobj = { "ns": ns, "enabled": true };
+		if (ns != undefined) {
+			// try to find a match in the list of named namespaces
+			var prefix = _.findKey(queryPrefixes, function(pu) { return ns.startsWith(pu); });
 			if (prefix != undefined)
-				nsobj.prefix = prefix;
-			Repo.namespaces.push(nsobj);
-		}	
+				ns = queryPrefixes[prefix]; // this is to reduce the list of namespaces, e.g. http://dbpedia.org/class/yago/WikicatHIV/ is converted into http://dbpedia.org/class/yago/
+			// not in the repo?
+			if (_.find(Repo.namespaces, function(el) {return el.ns === ns;} ) == undefined) {
+				var nsobj = { "ns": ns, "enabled": true };
+				if (prefix != undefined)
+					nsobj.prefix = prefix;
+				Repo.namespaces.push(nsobj);
+			}	
+		}
 	});
 	// sort namespaces in the repo
 	Repo.namespaces = _.sortBy(Repo.namespaces, 'ns'); // last option by namespace uri
