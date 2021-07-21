@@ -19,6 +19,11 @@ These are some of the features of RDF Surveyor:
 * RESTful design
 
 
+Please cite RDF Surveyor as:
+
+> G. Vega-Gorgojo, L. Slaughter, B.M. von-Zernichow, N. Nikolov, D. Roman. Linked Data Exploration with RDF Surveyor. IEEE Access. 7(1):172199-172213, December 2019.
+
+
 Usage
 ==========
 RDF Surveyor is a web application developed in Javascript. You can easily deploy it in your web server or just try RDF Surveyor on [http://tools.sirius-labs.no/rdfsurveyor](http://tools.sirius-labs.no/rdfsurveyor)
